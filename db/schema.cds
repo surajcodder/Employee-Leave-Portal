@@ -49,9 +49,10 @@ entity Files : cuid, managed {
 }
 
 // Comment Entity for each Leave Request
+@odata.draft.enabled: false
 entity Comments : cuid, managed {
   commentsText : String(1000); // The actual comment message
-  user         : String(1); // 'C' for Customer, 'M' for Mahindra
+  user         : String(20); // 'C' for Customer, 'M' for Mahindra
   createdAt    : Timestamp; // Auto-filled by @managed
   leaveRequest : Association to LeaveRequest; // Foreign key relation
 }

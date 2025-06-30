@@ -125,10 +125,11 @@ sap.ui.define([
                 addFileFn.setParameter("mediaType", fileMeta.mediaType);
                 addFileFn.setParameter("size", fileMeta.fileSize);
                 addFileFn.setParameter("content", base64Content); // ✅ base64 string
+                await this.postComment(leaveID); // ✅ Save the comment here
 
                 await addFileFn.execute();
                 debugger
-                await this.postComment(leaveID); // ✅ Save the comment here
+
 
                 MessageToast.show("Leave request submitted with file and comment.");
                 this.onCancel();
@@ -216,14 +217,40 @@ sap.ui.define([
             const sComment = oCommentModel.getProperty("/comment");
 
             if (!sComment) {
-                // Optional: Skip if no comment entered
-                return;
+                return; // Skip if empty
             }
 
-            const oModel = this.getView().getModel();
+            try {
+                const oModel = this.getView().getModel(); // OData model
+                const baseUrl = oModel.getServiceUrl();
 
-            C
+                const payload = {
+                    commentsText: sComment,
+                    user: "admin", // You can replace this with dynamic user
+                    leaveRequest_ID: leaveID
+                };
+                debugger
+                const response = await fetch(`${baseUrl}Comments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+                debugger
+
+                if (!response.ok) {
+                    throw new Error("Failed to post comment");
+                }
+
+                MessageToast.show("Comment saved.");
+                oCommentModel.setProperty("/comment", ""); // Clear input
+            } catch (error) {
+                console.error("Comment creation failed:", error);
+                MessageToast.show("Failed to save comment.");
+            }
         }
+
 
 
 

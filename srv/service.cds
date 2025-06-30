@@ -1,11 +1,12 @@
 using db from '../db/schema';
 
 service MyService {
+  entity Comments     as projection on db.Comments;
   @odata.draft.enabled  @odata.draft.bypass
   entity LeaveRequest as projection on db.LeaveRequest;
 
   entity Files        as projection on db.Files;
-  entity Comments     as projection on db.Comments;
+ 
 
   function addLeaveRequest(employeeName : String(100),
                            leaveType : String(50),

@@ -1,0 +1,69 @@
+{
+  "name": "Employee_leave_approval",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@openui5/sap.m": "^1.128.0",
+    "@sap-cloud-sdk/connectivity": "^3.18.0",
+    "@sap-cloud-sdk/http-client": "^2.9.0",
+    "@sap-cloud-sdk/resilience": "^3.17.0",
+    "@sap/cds": "^7.9.4",
+    "@sap/cds-hana": "^2",
+    "@sap/xssec": "^4.8.0",
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1",
+    "@sap/cds-dk": "^7",
+    "@sap/eslint-plugin-cds": "^3",
+    "@sap/ux-specification": "^1.120.17",
+    "eslint": "^9",
+    "rimraf": "^5.0.5"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch-project1": "cds watch --open project1/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy Employee_leave_approval --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
+  },
+  "cds": {
+    "env": {
+      "fiori": {
+        "bypass_draft": true
+      }
+    },
+    "requires": {
+      "db": {
+      "kind": "hana",
+      "multiTenant": false,
+      "pool": {
+        "max": 1400,
+        "min": 100
+      }
+    },
+      "auth": "dummy",
+    "spa_api": {
+      "kind": "odata-v2",
+      "credentials": {
+        "destination": "sap_process_automation_service_user_access",
+        "url": "https://spa-api-gateway-bpi-us-prod.cfapps.us10.hana.ondemand.com",
+        "authentication": "OAuth2ClientCredentials"
+      },
+      "destinationOptions": {
+        "selectionStrategy": "alwaysProvider",
+        "jwt": null
+      }
+    },
+    
+      "uaa": {
+        "kind": "xsuaa"
+      }
+    }
+  }
+}

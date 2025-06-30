@@ -1,0 +1,75 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    controllerName="project1.controller.LeaveReqDetailed">
+
+    <Page
+        id="leaveDetailPage"
+        title="Leave Request Details"
+        showNavButton="true"
+        navButtonPress=".onNavBack">
+
+        <content>
+            <VBox id="_IDGenVBox3" class="sapUiSmallMargin">
+
+                <!-- Leave Header -->
+                <ObjectHeader
+                    id="_IDGenObjectHeader1"
+                    title="{employeeName}"
+                    number="{leaveType}" 
+                    numberUnit="{status}" />
+
+                <!-- Attributes -->
+                <ObjectAttribute id="_IDGenObjectAttribute" title="📅 Start Date" text="{startDate}" />
+                <ObjectAttribute id="_IDGenObjectAttribute1" title="📅 End Date" text="{endDate}" />
+                <ObjectAttribute id="_IDGenObjectAttribute2" title="📝 Reason" text="{reason}" />
+                <ObjectAttribute id="_IDGenObjectAttribute3" title="📋 Status" text="{status}" />
+
+                <!-- Attachments Section -->
+                <Panel
+                    id="attachmentsPanel"
+                    headerText="📎 Attachments"
+                    expandable="true"
+                    expanded="true"
+                    class="sapUiSmallMarginTop">
+
+                    <Table
+                        id="attachmentsTable"
+                        items="{documents>/items}"
+                        mode="None"
+                        noDataText="No attachments found.">
+
+                        <columns>
+                            <Column id="_IDGenColumn13">
+                                <Text id="_IDGenText17" text="File Name" />
+                            </Column>
+                            <Column id="_IDGenColumn14">
+                                <Text id="_IDGenText18" text="Type" />
+                            </Column>
+                            <Column id="_IDGenColumn15">
+                                <Text id="_IDGenText19" text="Size (KB)" />
+                            </Column>
+                            <Column id="_IDGenColumn16">
+                                <Text id="_IDGenText20" text="Last Modified" />
+                            </Column>
+                        </columns>
+
+                        <items>
+                            <ColumnListItem id="_IDGenColumnListItem2">
+                                <cells>
+                                    <Link id="_IDGenLink2" text="{documents>fileName}" press="openPreview" />
+                                    <Text id="_IDGenText21" text="{documents>mediaType}" />
+                                    <Text id="_IDGenText22" text="{= Math.round(${documents>fileSize} / 1024) }" />
+                                    <Text id="_IDGenText23" text="{documents>lastmodified}" />
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+
+                    </Table>
+                </Panel>
+
+            </VBox>
+        </content>
+
+    </Page>
+</mvc:View>

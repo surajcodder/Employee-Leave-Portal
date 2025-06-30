@@ -1,0 +1,28 @@
+/* Base style for the box */
+.coloredBox {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Approved - Green Box */
+.coloredBox.sapMObjStatusSuccess {
+    background-color: #dff5e1;
+    border: 1px solid #2e7d32;
+    color: #2e7d32;
+}
+
+/* Pending - Orange Box */
+.coloredBox.sapMObjStatusWarning {
+    background-color: #fff3e0;
+    border: 1px solid #ef6c00;
+    color: #ef6c00;
+}
+
+/* Cancel - Red Box */
+.coloredBox.sapMObjStatusError {
+    background-color: #fdecea;
+    border: 1px solid #d32f2f;
+    color: #d32f2f;
+}

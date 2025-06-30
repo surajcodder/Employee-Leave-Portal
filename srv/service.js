@@ -2,7 +2,7 @@ const { Console } = require("console");
 const axios = require('axios');
 const cds = require('@sap/cds');
 module.exports = cds.service.impl(async function () {
-  const { LeaveRequest, Files } = this.entities;
+  const { LeaveRequest, Files, Comments } = this.entities;
 
   this.on('addLeaveRequest', async (req) => {
     console.log("Received Leave Request:", req.data);
@@ -42,7 +42,7 @@ module.exports = cds.service.impl(async function () {
     //     content: Buffer.from(req.data.content, 'base64'),  // convert base64 to binary
     //   });
     // }
-    
+
 
     // ✅ Trigger Workflow after insertion
     // const workflowContent = JSON.stringify({
@@ -55,7 +55,7 @@ module.exports = cds.service.impl(async function () {
     //         "status": status,
     //         "customername": employeeName,
     //         "id": foundID
-        
+
     // }
     // });
 
@@ -91,18 +91,18 @@ module.exports = cds.service.impl(async function () {
   this.on('addFileToLeave', async (req) => {
     debugger
     const { leaveID, fileName, mediaType, size, content } = req.data;
-  
 
-  
+
+
     // 📝 Insert file metadata linked to the draft leave
     const [newFile] = await INSERT.into(Files).entries({
       fileName,
       mediaType,
       size,
-      leaveRequestID : leaveID, // this is the association field
+      leaveRequestID: leaveID, // this is the association field
       content
     });
-  
+
     console.log("File metadata added to draft leave:", newFile);
     const leaveData = await SELECT.one.from(LeaveRequest).where({ ID: leaveID });
 
@@ -111,30 +111,35 @@ module.exports = cds.service.impl(async function () {
       return;
     }
 
-     // 🧩 Compose file JSON string to pass in workflow "file" field
-  const fileString = JSON.stringify({
-    fileName,
-    mediaType,
-    size,
-    content
-  });
+    // 🧩 Compose file JSON string to pass in workflow "file" field
+    const fileString = JSON.stringify({
+      fileName,
+      mediaType,
+      size,
+      content
+    });
 
+    const commentEntries = await SELECT.from(Comments).where({ leaveRequest_ID: leaveID });
 
-
+    // 🎯 JSON.stringify the entire comments array
+    const formattedComments = JSON.stringify(commentEntries);
+    debugger
     // ✅ Trigger Workflow after insertion
     const workflowContent = JSON.stringify({
-        "definitionId": "us10.ede812adtrial.leaveapproval.process1",
-        "context": {
-            "leavetype": leaveData.leaveType,
-            "startdate": leaveData.startDate,
-            "enddate": leaveData.endDate,
-            "reason": leaveData.reason,
-            "status": leaveData.status,
-            "customername": leaveData.employeeName,
-            "id": leaveID,
-            "file": fileString
-        
-    }
+      "definitionId": "us10.ede812adtrial.leaveapproval.process1",
+      "context": {
+        "leavetype": leaveData.leaveType,
+        "startdate": leaveData.startDate,
+        "enddate": leaveData.endDate,
+        "reason": leaveData.reason,
+        "status": leaveData.status,
+        "customername": leaveData.employeeName,
+        "id": leaveID,
+        "file": fileString,
+        "comments": formattedComments
+
+
+      }
     });
 
     const token = await generateToken();
@@ -159,12 +164,12 @@ module.exports = cds.service.impl(async function () {
       console.error("Workflow trigger failed:", error.response?.data || error.message);
       // optionally handle failure here (e.g., log to DB or notify)
     }
-  
+
     // ✅ Return the generated file ID for binary upload
     return newFile.ID;
   });
 
-  
+
 
 
   // 🔐 Token generator

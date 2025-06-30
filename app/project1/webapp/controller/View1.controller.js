@@ -12,7 +12,7 @@ sap.ui.define([
             debugger
             if (!oUserModel) {
                 sap.m.MessageToast.show("User not found. Please login again.");
-                this.getOwnerComponent().getRouter().navTo("Login");
+                this.getOwnerComponent().getRouter().navTo("RouteLogin");
             }
 
         },

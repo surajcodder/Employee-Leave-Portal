@@ -4,8 +4,28 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("project1.controller.View1", {
-        onInit() {
+        onInit: function () {
+            debugger
+            const oRouter = this.getOwnerComponent().getRouter();
+            oRouter.getRoute("View1").attachPatternMatched(this._onRouteMatched, this);
+            const oUserModel = this.getOwnerComponent().getModel("userModel");
+            debugger
+            if (!oUserModel) {
+                sap.m.MessageToast.show("User not found. Please login again.");
+                this.getOwnerComponent().getRouter().navTo("RouteLogin");
+            }
+
         },
+
+        _onRouteMatched: function () {
+            const oTable = this.byId("leaveRequestTable");
+            const oBinding = oTable.getBinding("items");
+            if (oBinding) {
+                oBinding.refresh(); // ✅ This will reload the table data
+            }
+        },
+
+        
         onAfterRendering: function () {
             debugger
             const oTable = this.byId("leaveRequestTable");

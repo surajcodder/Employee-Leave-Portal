@@ -106,8 +106,15 @@
       },
       "routes": [
         {
-          "name": "RouteView1",
+          "name": "RouteLogin",
           "pattern": ":?query:",
+          "target": [
+            "TargetLogin"
+          ]
+        },
+        {
+          "name": "View1",
+          "pattern": "home",
           "target": [
             "TargetView1"
           ]
@@ -135,23 +142,28 @@
         }
       ],
       "targets": {
+        "TargetLogin": {
+          "viewName": "Login",
+          "viewId": "login"
+        },
         "TargetView1": {
-          "id": "View1",
-          "name": "View1"
+          "viewName": "View1",
+          "viewType": "XML",
+          "viewId": "home"
         },
         "TargetUpdateLeaveReq": {
-          "id": "UpdateLeaveReq",
-          "name": "UpdateLeaveReq",
+          "viewId": "UpdateLeaveReq",
+          "viewName": "UpdateLeaveReq",
           "viewType": "XML"
         },
         "TargetLeaveReqObject": {
-          "id": "LeaveReqObject",
-          "name": "LeaveReqObject",
+          "viewId": "LeaveReqObject",
+          "viewName": "LeaveReqObject",
           "viewType": "XML"
         },
         "TargetLeaveReqDetailed": {
-          "id": "LeaveReqDetailed",
-          "name": "LeaveReqDetailed",
+          "viewId": "LeaveReqDetailed",
+          "viewName": "LeaveReqDetailed",
           "viewType": "XML"
         }
       }

@@ -21,22 +21,27 @@ sap.ui.define([
         onInit: function () {
             const oDocModel = new JSONModel({ items: [] });
             this.getView().setModel(oDocModel, "documents");
+            // this.getOwnerComponent().setModel(oUserModel, "userModel");
+            const oCommentModel = new sap.ui.model.json.JSONModel({
+                comment: ""
+            });
+            this.getView().setModel(oCommentModel, "commentModel");
         },
 
         onBeforeUploadStarts: async function (oEvent) {
             const oItem = oEvent.getParameter("item");
             const oFile = await oItem.getFileObject?.();
-        
+
             if (!oFile) {
                 MessageToast.show("No file selected.");
                 return;
             }
-        
+
             const base64 = await this.fileToBase64(oFile); // ✅ convert content
-        
+
             const oModel = this.getView().getModel("documents");
             const aItems = oModel.getProperty("/items") || [];
-        
+
             aItems.push({
                 fileName: oFile.name,
                 mediaType: oFile.type,
@@ -45,25 +50,25 @@ sap.ui.define([
                 content: base64,     // ✅ THIS is what was missing earlier
                 ID: null             // Will be filled later after backend save
             });
-        
+
             oModel.setProperty("/items", aItems);
             oEvent.preventDefault(); // ✅ prevent native upload
             MessageToast.show("File stored locally.");
         },
-        
 
-         fileToBase64(file) {
+
+        fileToBase64(file) {
             return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = () => {
-                const base64 = reader.result.split(",")[1]; // remove "data:*/*;base64,"
-                resolve(base64);
-              };
-              reader.onerror = reject;
-              reader.readAsDataURL(file);
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(",")[1]; // remove "data:*/*;base64,"
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
             });
-          },
-          
+        },
+
 
 
         onCreate: async function () {
@@ -112,45 +117,27 @@ sap.ui.define([
                 const fileMeta = aFiles[0];
                 const base64Content = await this.fileToBase64(fileMeta.fileObject); // ✅ fixed call
 
-                
+
                 const addFileFn = oModel.bindContext("/addFileToLeave(...)");
-                
+
                 addFileFn.setParameter("leaveID", leaveID);
                 addFileFn.setParameter("fileName", fileMeta.fileName);
                 addFileFn.setParameter("mediaType", fileMeta.mediaType);
                 addFileFn.setParameter("size", fileMeta.fileSize);
                 addFileFn.setParameter("content", base64Content); // ✅ base64 string
-                
+                await this.postComment(leaveID); // ✅ Save the comment here
+
                 await addFileFn.execute();
+                debugger
 
-                // const fileResult = await addFile.getBoundContext().requestObject();
-                // const fileID = fileResult.value;
 
-                // const content = await getFileContentFromUploadSet(fileMeta.fileName, aFiles);
-                // if (!content) {
-                //     MessageToast.show("File content missing. Upload failed.");
-                //     return;
-                // }
-                // const url = ${baseUrl}LeaveRequest(ID=${leaveID},IsActiveEntity=true)/files;
-                // await fetch(`${baseUrl}/LeaveRequest(ID=${leaveID},IsActiveEntity=true)/files(ID=${fileID},IsActiveEntity=true)/content`, {
-                //     method: "PUT",
-                //     headers: {
-                //         "Content-Type": fileMeta.mediaType
-                //     },
-                //     body: content
-                // });
-                // const uploadUrl = `${baseUrl}Files(ID=${fileID},IsActiveEntity=false)/content`;
-
-                // await fetch(uploadUrl, {
-                //     method: "PUT",
-                //     headers: {
-                //         "Content-Type": fileMeta.mediaType
-                //     },
-                //     body: content  // must be ArrayBuffer or Blob
-                // });
-
+                MessageToast.show("Leave request submitted with file and comment.");
+                this.onCancel();
 
                 MessageToast.show("Leave request submitted with file.");
+                debugger
+
+                debugger
                 this.onCancel();
             } catch (error) {
                 console.error("Upload failed:", error);
@@ -159,7 +146,7 @@ sap.ui.define([
         },
 
         onCancel: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteView1");
+            this.getOwnerComponent().getRouter().navTo("View1");
         },
 
 
@@ -172,7 +159,7 @@ sap.ui.define([
             const base64 = oDocData.content;
             const fileName = oDocData.fileName;
             const mediaType = oDocData.mediaType || "application/octet-stream";
-        
+
             // Case 1: Preview from local model (unsaved)
             if (base64) {
                 const byteCharacters = atob(base64);
@@ -182,33 +169,33 @@ sap.ui.define([
                 }
                 const byteArray = new Uint8Array(byteNumbers);
                 const blob = new Blob([byteArray], { type: mediaType });
-        
+
                 const url = URL.createObjectURL(blob);
                 window.open(url, "_blank");
                 return;
             }
-        
+
             // Case 2: Preview from backend (already saved to DB)
             const fileID = oDocData.ID; // ensure this is populated during upload (if saved)
             if (!fileID) {
                 MessageToast.show("File not yet saved. Please submit first.");
                 return;
             }
-        
+
             try {
                 const oModel = this.getView().getModel();
                 const baseUrl = oModel.getServiceUrl();
                 const response = await fetch(`${baseUrl}Files(ID=${fileID},IsActiveEntity=true)`);
                 const fileData = await response.json();
-        
+
                 if (!fileData.content) {
                     MessageToast.show("No content found in database.");
                     return;
                 }
-        
+
                 const backendBase64 = fileData.content;
                 const backendMediaType = fileData.mediaType || "application/octet-stream";
-        
+
                 const byteCharacters = atob(backendBase64);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
@@ -216,15 +203,57 @@ sap.ui.define([
                 }
                 const byteArray = new Uint8Array(byteNumbers);
                 const blob = new Blob([byteArray], { type: backendMediaType });
-        
+
                 const url = URL.createObjectURL(blob);
                 window.open(url, "_blank");
             } catch (error) {
                 console.error("Preview failed:", error);
                 MessageToast.show("Failed to load preview.");
             }
+        },
+        postComment: async function (leaveID) {
+            debugger
+            const oCommentModel = this.getView().getModel("commentModel");
+            const sComment = oCommentModel.getProperty("/comment");
+
+            if (!sComment) {
+                return; // Skip if empty
+            }
+
+            try {
+                const oModel = this.getView().getModel(); // OData model
+                const baseUrl = oModel.getServiceUrl();
+
+                const payload = {
+                    commentsText: sComment,
+                    user: "admin", // You can replace this with dynamic user
+                    leaveRequest_ID: leaveID
+                };
+                debugger
+                const response = await fetch(`${baseUrl}Comments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+                debugger
+
+                if (!response.ok) {
+                    throw new Error("Failed to post comment");
+                }
+
+                MessageToast.show("Comment saved.");
+                oCommentModel.setProperty("/comment", ""); // Clear input
+            } catch (error) {
+                console.error("Comment creation failed:", error);
+                MessageToast.show("Failed to save comment.");
+            }
         }
-        
-        
+
+
+
+
+
     });
 });

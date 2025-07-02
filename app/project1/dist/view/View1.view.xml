@@ -4,9 +4,10 @@
     xmlns="sap.m"
 >
     <Page
-        id="_IDGenPage1"
-        title="Leave Requests"
-    >
+    id="_IDGenPage1"
+     title="{= 'Welcome ' + ${userModel>/employeeName} + ', Your Leave Request Portal' }"
+>
+
         <headerContent>
             <OverflowToolbar id="_IDGenOverflowToolbar1">
                 <Button
@@ -88,7 +89,7 @@
                             <ObjectStatus
                                 id="_IDGenObjectStatus1"
                                 text="{status}"
-                                state="{= ${status} === 'Approved' ? 'Success' : ${status} === 'Pending' ? 'Warning' : ${status} === 'Cancel' ? 'Error' : 'None' }"
+                                state="{= ${status} === 'Approved' ? 'Success' : ${status} === 'Pending' ? 'Warning' : ${status} === 'Rejected' ? 'Error' : 'None' }"
                                 class="coloredBox"
                             />
                             <HBox id="_IDGenHBox1">

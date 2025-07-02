@@ -6,20 +6,20 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@cap-js/hana": "^2.1.1",
     "@openui5/sap.m": "^1.128.0",
     "@sap-cloud-sdk/connectivity": "^3.18.0",
     "@sap-cloud-sdk/http-client": "^2.9.0",
     "@sap-cloud-sdk/resilience": "^3.17.0",
-    "@sap/cds": "^7.9.4",
-    "@sap/cds-hana": "^2",
+    "@sap/cds": "^9.0.4",
+    "@sap/xsenv": "^5.6.1",
     "@sap/xssec": "^4.8.0",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
     "express": "^4.19.2"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^1",
-    "@sap/cds-dk": "^7",
+    "@sap/cds-dk": "^9.0.6",
     "@sap/eslint-plugin-cds": "^3",
     "@sap/ux-specification": "^1.120.17",
     "eslint": "^9",
@@ -40,27 +40,26 @@
     },
     "requires": {
       "db": {
-      "kind": "hana",
-      "multiTenant": false,
-      "pool": {
-        "max": 1400,
-        "min": 100
-      }
-    },
-      "auth": "dummy",
-    "spa_api": {
-      "kind": "odata-v2",
-      "credentials": {
-        "destination": "sap_process_automation_service_user_access",
-        "url": "https://spa-api-gateway-bpi-us-prod.cfapps.us10.hana.ondemand.com",
-        "authentication": "OAuth2ClientCredentials"
+        "kind": "hana",
+        "multiTenant": false,
+        "pool": {
+          "max": 1400,
+          "min": 100
+        }
       },
-      "destinationOptions": {
-        "selectionStrategy": "alwaysProvider",
-        "jwt": null
-      }
-    },
-    
+      "auth": "dummy",
+      "spa_api": {
+        "kind": "odata-v2",
+        "credentials": {
+          "destination": "sap_process_automation_service_user_access",
+          "url": "https://spa-api-gateway-bpi-us-prod.cfapps.us10.hana.ondemand.com",
+          "authentication": "OAuth2ClientCredentials"
+        },
+        "destinationOptions": {
+          "selectionStrategy": "alwaysProvider",
+          "jwt": null
+        }
+      },
       "uaa": {
         "kind": "xsuaa"
       }

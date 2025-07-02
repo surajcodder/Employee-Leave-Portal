@@ -146,7 +146,7 @@ sap.ui.define([
         },
 
         onCancel: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteLogin");
+            this.getOwnerComponent().getRouter().navTo("View1");
         },
 
 

@@ -7,6 +7,7 @@ sap.ui.define([
 
 
 onInit: function () {
+    debugger
     // const oRouter = this.getOwnerComponent().getRouter();
     // oRouter.getRoute("UpdateLeaveReq").attachPatternMatched(this._onRouteMatched, this);
 },

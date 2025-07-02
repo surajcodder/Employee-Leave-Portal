@@ -86,6 +86,35 @@ module.exports = cds.service.impl(async function () {
   });
 
 
+  this.on('addCommentToLeave', async (req) => {
+    debugger;
+
+    let { leaveRequestID, commentsText, user } = req.data;
+
+    // 🔍 Remove leading/trailing quotes if present
+    if (commentsText?.startsWith("'") && commentsText?.endsWith("'")) {
+      commentsText = commentsText.slice(1, -1);
+    }
+  
+    if (!leaveRequestID || !commentsText || !user) {
+      return req.error(400, "Missing required fields.");
+    }
+  
+    const leaveData = await SELECT.one.from(LeaveRequest).where({ ID: leaveRequestID });
+    if (!leaveData) return req.error(404, "LeaveRequest not found.");
+  
+    const [newComment] = await INSERT.into(Comments).entries({
+      commentsText,
+      user,
+      leaveRequest_ID: leaveRequestID,
+      createdAt: new Date()
+    });
+  
+    return newComment.ID;
+  });
+
+
+
 
 
   this.on('addFileToLeave', async (req) => {
